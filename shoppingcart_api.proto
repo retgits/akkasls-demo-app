@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package com.example.shoppingcart;
+
+import "akkaserverless/annotations.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "shoppingcart_domain.proto";
+
+message Cart {
+  repeated LineItem items = 1;
+}
+
+message LineItem {
+  string product_id = 1;
+  string name = 2;
+  int32 quantity = 3;
+}
+
+message AddLineItem {
+  string cart_id = 1 [(akkaserverless.field).entity_key = true];
+  string product_id = 2;
+  string name = 3;
+  int32 quantity = 4;
+}
+
+message RemoveLineItem {
+  string cart_id = 1 [(akkaserverless.field).entity_key = true];
+  string product_id = 2;
+}
+
+message RemoveShoppingCart {
+  string cart_id = 1 [(akkaserverless.field).entity_key = true];
+}
+
+message GetShoppingCart {
+  string cart_id = 1 [(akkaserverless.field).entity_key = true];
+}
+
+service ShoppingCartService {
+  option (akkaserverless.service) = {
+    type: SERVICE_TYPE_ENTITY
+    component: "com.example.shoppingcart.domain.ShoppingCart"
+  };
+
+  rpc AddItem(AddLineItem) returns (google.protobuf.Empty) {
+    option (google.api.http).post = "/cart/{cart_id}/items/add"
+    };
+  }
+
+  rpc RemoveItem(RemoveLineItem) returns (google.protobuf.Empty) {
+    option (google.api.http).post = "/cart/{cart_id}/items/{product_id}/remove"
+    };
+  }
+
+  rpc RemoveCart (RemoveShoppingCart) returns (google.protobuf.Empty) {
+    option (google.api.http).post = "/carts/{cart_id}/remove";
+  }
+}
+
+service ShoppingCartView {
+  rpc ShoppingCartUpdate (com.example.shoppingcart.domain.Cart) returns (com.example.shoppingcart.domain.Cart) {
+    option (akkaserverless.method).eventing.in = {
+      value_entity: "shoppingcart"
+    };
+    option (akkaserverless.method).view.update = {
+      table: "shoppingcart"
+    };
+  }
+
+  rpc GetCart(GetShoppingCart) returns (com.example.shoppingcart.domain.Cart) {
+    option (akkaserverless.method).view.query = {
+        query: "SELECT * FROM shoppingcart WHERE cart_id = :cart_id"
+    };
+    option (google.api.http) = {
+      get: "/carts/{cart_id}"
+    };
+  }
+}

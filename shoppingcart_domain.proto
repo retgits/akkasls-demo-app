@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package com.example.shoppingcart.domain;
+
+import "akkaserverless/annotations.proto";
+
+option (akkaserverless.file).value_entity = {
+  name: "ShoppingCart"
+  entity_type: "shoppingcart"
+  state: "Cart"
+};
+
+message ItemAdded {
+  LineItem item = 1;
+}
+
+message ItemRemoved {
+  string productId = 1;
+}
+message Cart {
+  repeated LineItem items = 1;
+}
+
+message LineItem {
+  string productId = 1;
+  string name = 2;
+  int32 quantity = 3;
+}

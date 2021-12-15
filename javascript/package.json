@@ -1,0 +1,32 @@
+{
+  "name": "shoppingcart",
+  "version": "1.0.0",
+  "description": "Shopping Cart for ACME Fitness",
+  "main": "index.js",
+  "author": "retgits",
+  "license": "Apache-2.0",
+  "repository": {
+    "url": "https://github.com/retgits/akkaserverless"
+  },
+  "type": "module",
+  "scripts": {
+    "pretest": "compile-descriptor ./shoppingcart_api.proto ./shoppingcart_domain.proto",
+    "build": "compile-descriptor ./shoppingcart_api.proto ./shoppingcart_domain.proto",
+    "start": "node index.js",
+    "container:build": "docker buildx build --platform linux/amd64 . -t retgits/shoppingcart",
+    "container:push": "docker push retgits/shoppingcart",
+    "devmode:network:create": "docker network create -d bridge akkasls",
+    "devmode:network:destroy": "docker network rm akkasls",
+    "devmode:proxy:start": "docker run --rm -it --name proxy --network akkasls -p 9000:9000 --env USER_FUNCTION_HOST=userfunction gcr.io/akkaserverless-public/akkaserverless-proxy:latest -Dconfig.resource=dev-mode.conf -Dcloudstate.proxy.protocol-compatibility-check=false",
+    "devmode:proxy:stop": "docker stop proxy && docker rm proxy",
+    "devmode:container:start": "docker run --rm -it --name userfunction --hostname userfunction --network akkasls retgits/shoppingcart",
+    "devmode:container:stop": "docker stop userfunction && docker rm userfunction",
+    "cb": "echo 'docker buildx build --platform linux/amd64 . -t retgits/shoppingcart'",
+    "pc": "echo 'docker push retgits/shoppingcart'",
+    "ds": "echo 'akkasls services deploy cart retgits/shoppingcart'"
+  },
+  "keywords": [],
+  "dependencies": {
+    "@lightbend/akkaserverless-javascript-sdk": "^0.33.1"
+  }
+}
