@@ -23,7 +23,8 @@
     "devmode:container:stop": "docker stop userfunction && docker rm userfunction",
     "cb": "echo 'docker buildx build --platform linux/amd64 . -t retgits/shoppingcart'",
     "pc": "echo 'docker push retgits/shoppingcart'",
-    "ds": "echo 'akkasls services deploy cart retgits/shoppingcart'"
+    "ds": "echo 'akkasls services deploy cart retgits/shoppingcart'",
+    "ui": "akkasls services proxy cart --grpcui"
   },
   "keywords": [],
   "dependencies": {
